@@ -1,0 +1,21 @@
+{
+    "name": "lzaplata/csobpaymentgateway",
+    "description": "ČSOB payment gateway wrapper for Nette Framework.",
+    "keywords": ["nette", "csob", "gateway"],
+    "homepage": "https://github.com/LZaplata/CsobPaymentGateway",
+    "authors": [
+        {
+            "name": "Lukáš Záplata",
+            "email": "lukas.zaplata@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4",
+        "nette/di": "~2.3",
+        "nette/application": "~2.3",
+        "nette/utils": "~2.3"
+    },
+    "autoload": {
+        "classmap": ["src/"]
+    }
+}
