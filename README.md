@@ -28,7 +28,7 @@ Now you can set parameters...
 csobPaymentGateway:
         merchantId      : *
         sandbox         : true
-        privatekey:
+        privateKey:
             path        : *                        
             password    : *
         publicKey       : *                      
