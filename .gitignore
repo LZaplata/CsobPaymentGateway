@@ -1,1 +1,5 @@
 .idea/
+vendor/
+src/keys/
+composer.lock
+index.php
