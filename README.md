@@ -29,7 +29,7 @@ csobPaymentGateway:
         merchantId      : *
         sandbox         : true
         currency        : CZK
-        privatekey:
+        privateKey:
             path        : *                        
             password    : *
         publicKey       : *                      
