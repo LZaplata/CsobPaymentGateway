@@ -8,7 +8,8 @@ use Nette\DI\CompilerExtension;
 class Extension extends CompilerExtension
 {
     public $defaults = [
-        "sandbox" => true
+        "sandbox" => true,
+        "currency" => "CZK"
     ];
 
     public function loadConfiguration()
@@ -17,6 +18,6 @@ class Extension extends CompilerExtension
         $builder = $this->getContainerBuilder();
 
         $builder->addDefinition($this->prefix("config"))
-            ->setClass("LZaplata\CsobPaymentGateway\Service", [$config["merchantId"], $config["sandbox"], $config["privateKey"], $config["publicKey"]]);
+            ->setClass("LZaplata\CsobPaymentGateway\Service", [$config["merchantId"], $config["sandbox"], $config["privateKey"], $config["publicKey"], $config["currency"]]);
     }
 }

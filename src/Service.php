@@ -3,11 +3,7 @@
 namespace LZaplata\CsobPaymentGateway;
 
 
-use Nette\Application\Responses\RedirectResponse;
-use Nette\FileNotFoundException;
 use Nette\Object;
-use Nette\Utils\Json;
-use Nette\Utils\Strings;
 
 class Service extends Object
 {
@@ -26,37 +22,24 @@ class Service extends Object
     /** @var string */
     public $url;
 
-    /** @var array */
-    public $orderedParameters = [
-        1 => "merchantId",
-        2 => "orderNo",
-        3 => "dttm",
-        4 => "payOperation",
-        5 => "payMethod",
-        6 => "totalAmount",
-        7 => "currency",
-        8 => "closePayment",
-        9 => "returnUrl",
-        10 => "returnMethod",
-        11 => "cart",
-        12 => "description",
-        15 => "language",
-        16 => "signature"
-    ];
+    /** @var string */
+    public $currency;
 
     /**
      * Service constructor.
      * @param int $merchantId
      * @param bool $sandbox
-     * @param string $privateKey
+     * @param array $privateKey
      * @param string $publicKey
+     * @param string $currency
      */
-    public function __construct($merchantId, $sandbox, $privateKey, $publicKey)
+    public function __construct($merchantId, $sandbox, $privateKey, $publicKey, $currency)
     {
         $this->setMerchantId($merchantId);
         $this->setSandbox($sandbox);
         $this->setPrivateKey($privateKey);
         $this->setPublicKey($publicKey);
+        $this->setCurrency($currency);
     }
 
     /**
@@ -71,6 +54,14 @@ class Service extends Object
     }
 
     /**
+     * @return int
+     */
+    public function getMerchantId()
+    {
+        return $this->merchantId;
+    }
+
+    /**
      * @param int $sandbox
      * @return self
      */
@@ -79,12 +70,20 @@ class Service extends Object
         $this->sandbox = $sandbox;
 
         if ($sandbox) {
-            $this->url = "https://iapi.iplatebnibrana.csob.cz/api/v1.5";
+            $this->url = "https://iapi.iplatebnibrana.csob.cz/api/v1.7";
         } else {
-            $this->url = "https://api.platebnibrana.csob.cz/api/v1.6";
+            $this->url = "https://api.platebnibrana.csob.cz/api/v1.7";
         }
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->url;
     }
 
     /**
@@ -99,6 +98,14 @@ class Service extends Object
     }
 
     /**
+     * @return array
+     */
+    public function getPrivateKey()
+    {
+        return $this->privateKey;
+    }
+
+    /**
      * @param int $publicKey
      * @return self
      */
@@ -110,149 +117,53 @@ class Service extends Object
     }
 
     /**
-     * @param $values
-     * @return mixed
-     * @throws \Nette\Utils\JsonException
-     */
-    public function createOrder($values)
-    {
-        foreach ($values["cart"] as $key => $product) {
-            foreach ($product as $item => $value) {
-                if ($item == "name") {
-                    $values["cart"][$key][$item] = Strings::truncate($value, 17);
-                }
-
-                if ($item == "description") {
-                    $values["cart"][$key][$item] = Strings::truncate($value, 37);
-                }
-            }
-        }
-
-        $values["merchantId"] = htmlspecialchars($this->merchantId);
-        $values["payOperation"] = "payment";
-        $values["payMethod"] = "card";
-        $values["returnMethod"] = "POST";
-        $values["closePayment"] = "true";
-        $values["language"] = "CZ";
-        $values["dttm"] = date("YmdHis");
-        $values["description"] = "purchase";
-        $values["signature"] = $this->createSignature($values);
-
-        $ch = curl_init($this->url . "/payment/init");
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($ch, CURLOPT_POSTFIELDS, Json::encode($values));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array (
-            'Content-Type: application/json',
-            'Accept: application/json;charset=UTF-8'
-        ));
-
-        $order = curl_exec($ch);
-
-        curl_close($ch);
-
-        return $order;
-    }
-
-    /**
-     * @param array $values
      * @return string
      */
-    public function createSignature($values)
+    public function getPublicKey()
     {
-        unset($this->orderedParameters[16]);
-
-        $parameters = [];
-
-        foreach ($this->orderedParameters as $key => $orderedParameter) {
-            if ($orderedParameter == "cart") {
-                $cart = array();
-
-                foreach ($values[$orderedParameter] as $product) {
-                    $cart[] = implode("|", $product);
-                }
-
-                $parameters[$orderedParameter] = implode("|", $cart);
-            } else {
-                $parameters[$orderedParameter] = $values[$orderedParameter];
-            }
-
-        }
-
-        return $this->sign(implode("|", $parameters));
+        return $this->publicKey;
     }
 
     /**
-     * @param string $data
+     * @param string $currency
+     * @return $this
+     */
+    public function setCurrency($currency)
+    {
+        $this->currency = $currency;
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
-    public function sign($data)
+    public function getCurrency()
     {
-        $handle = fopen($this->privateKey["path"], "r");
-
-        if (!$handle) {
-            throw new FileNotFoundException("File " . $this->privateKey["path"] . " not found.");
-        }
-
-        $privateKey = fread($handle, filesize($this->privateKey["path"]));
-
-        fclose($handle);
-
-        $privateKeyId = openssl_get_privatekey($privateKey, $this->privateKey["password"]);
-
-        openssl_sign($data, $signature, $privateKeyId);
-
-        $signature = base64_encode($signature);
-
-        openssl_free_key($privateKeyId);
-
-        return $signature;
+        return $this->currency;
     }
 
     /**
-     * @param mixed $order
-     * @return string
-     * @throws \Nette\Utils\JsonException
+     * @param int $orderNo
+     * @param float $totalAmount
+     * @param string $returnUrl
+     * @param Cart $cart
+     * @return Payment
      */
-    public function pay($order)
+    public function createPayment($orderNo, $totalAmount, $returnUrl, Cart $cart)
     {
-        $response = Json::decode($order);
+        $payment = new Payment($this);
+        $payment->createPayment($orderNo, $totalAmount, $returnUrl, $cart);
 
-        $this->verify($response);
-
-        $data = $this->merchantId . "|" . $response->payId . "|" . $response->dttm;
-        $signature = $this->sign($data);
-
-        return new RedirectResponse($this->url. "/payment/process/". $this->merchantId . "/" . $response->payId . "/" . $response->dttm . "/" . urlencode($signature));
+        return $payment;
     }
 
     /**
-     * @param array $response
+     * @return Response
      */
-    public function verify($response)
+    public function getReturnResponse()
     {
-        $data = $response->payId . "|" . $response->dttm . "|" . $response->resultCode . "|" . $response->resultMessage;
-
-        if(!is_null($response->paymentStatus)) {
-            $data .= "|" . $response->paymentStatus;
-        }
-
-        $handle = fopen($this->publicKey, "r");
-
-        if (!$handle) {
-            throw new FileNotFoundException("File " . $this->publicKey . " not found.");
-        }
-
-        $publicKey = fread($handle, filesize($this->publicKey));
-
-        fclose($handle);
-
-        $publicKeyId = openssl_get_publickey($publicKey);
-        $signature = base64_decode($response->signature);
-        $result = openssl_verify($data, $signature, $publicKeyId);
-
-        openssl_free_key($publicKeyId);
+        return new Response(null, $this, null);
     }
 
     /**

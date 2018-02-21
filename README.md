@@ -28,6 +28,7 @@ Now you can set parameters...
 csobPaymentGateway:
         merchantId      : *
         sandbox         : true
+        currency        : CZK
         privatekey:
             path        : *                        
             password    : *
@@ -43,50 +44,54 @@ use LZaplata\CsobPaymentGateway\Service;
 public $csobPaymentGateway;
 ````
 ## Usage
-In first step you must create order instantion.
+Create cart instance and add items.
 
 ````php
-$order = $this->csobPaymentGateway->createOrder([
-        "orderNo" => $orderNo,          
-        "currency" => $currency,                    // CZK
-        "totalAmount" => $price,                    // order price in lowest currency unit (1 CZK = 100)
-        "returnUrl" => $returnUrl,                  
-        "cart" => [
-                0 => [
-                        "name" => $productName,
-                        "quantity" => $quantity,
-                        "amount" => $productPrice,  // product price in lowest currency unit (1 CZK = 100)
-                        "description" => $productDesc
-                ]
-        ]
-]);
+$cart = new Cart();
+$cart->setItem($name, $quantity, $amount, $description);
 ````
 
-Second step decides if creating order is successful...
+Create payment.
 
 ````php
-try {
-        $response = $this->csobPaymentGateway->pay($order);
-} catch (\OpenPayU_Exception $e) {
-        print $e->getMessage();
-}
+$payment = $this->csobPaymentGateway->createPayment(
+        $orderNo,          
+        $totalAmount,                    // payment price in lowest currency unit (1 CZK = 100)
+        $returnUrl,                  
+        $cart                            // cart instace from step above
+);
 ````
 
-...and finally you can redirect to gateway.
+Send payment.
 
 ````php
-$this->sendResponse($response);
+$response = $payment->send();
+````
+
+Get payment ID and save it to database.
+
+````php
+$payId = $response->getPayId();
+````
+
+Redirect to payment gateway.
+
+````php
+$this->sendResponse($response->getRedirectResponse());
 ````
 
 ...or get redirect url.
 
 ````php
-$response->getUrl();
+$response->getRedirectUrl();
 ````
 ### After return from gateway
-You can check if order is paid. If you call function without parameter, 
-it automatically handle `$_POST` which returns from gateway.
+Get response and check if payment was successful
 
 ````php
-$this->csobPaymentGateway->isPaid();
+$response = $this->csobPaymentGateway->getReturnResponse();
+
+if ($response->isOk()) {
+    // do something
+}
 ````
