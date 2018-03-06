@@ -65,6 +65,39 @@ class Payment extends Object
         $this->paymentData["signature"] = $this->signPaymentData($this->paymentData);
     }
 
+    public function reversePayment($payId)
+    {
+        $this->paymentData = [
+            "merchantId" => $this->service->getMerchantId(),
+            "payId" => $payId,
+            "dttm" => date("YmdHis")
+        ];
+
+        $dataToSign = $this->service->getMerchantId() . "|" . $payId . "|" . $this->paymentData["dttm"];
+
+        $this->paymentData["signature"] = $this->sign($dataToSign);
+
+        $client = new Client();
+
+        $response = $client->put($this->service->getUrl() . "/payment/reverse", [
+            "headers" => [
+                "Content-Type" => "application/json",
+                "Accept" => "application/json;charset=UTF-8"
+            ],
+            "body" => Json::encode($this->paymentData)
+        ]);
+
+        if ($response->getStatusCode() != 200) {
+            throw new BadRequestException("Payment init failed. Reason phase: " . $response->getReasonPhrase());
+        }
+
+        if ($this->verifyPaymentData($response->json()) == false) {
+            throw new BadRequestException("Payment init failed. Unable to verify signature");
+        }
+
+        Debugger::dump($response->json());
+    }
+
     /**
      * @param array $data
      * @return string

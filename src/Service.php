@@ -179,4 +179,11 @@ class Service extends Object
             } else return false;
         } else return false;
     }
+
+    public function reversePayment($payId)
+    {
+        $payment = new Payment($this);
+
+        return $payment->reversePayment($payId);
+    }
 }
