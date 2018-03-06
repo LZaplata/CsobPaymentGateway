@@ -82,7 +82,7 @@ class Response extends Object
 
     public function isReversed()
     {
-        $response = $this->response;
+        $response = (object)$this->response;
 
         if ($response->resultCode == 0 && $response->paymentStatus == 5) {
             return true;
