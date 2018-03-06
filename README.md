@@ -95,3 +95,14 @@ if ($response->isOk()) {
     // do something
 }
 ````
+
+### Reverse payment
+Sometimes you must reverse your payment
+
+````php
+$response = $this->csobPaymentGateway->reversePayment($payId);
+
+if ($response->isReversed()) {
+    // do something
+}
+````

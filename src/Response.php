@@ -79,4 +79,13 @@ class Response extends Object
             } else return false;
         } else return false;
     }
+
+    public function isReversed()
+    {
+        $response = $this->response;
+
+        if ($response->resultCode == 0 && $response->paymentStatus == 5) {
+            return true;
+        } else return false;
+    }
 }

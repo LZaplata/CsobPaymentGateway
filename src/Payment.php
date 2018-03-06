@@ -95,7 +95,7 @@ class Payment extends Object
             throw new BadRequestException("Payment init failed. Unable to verify signature");
         }
 
-        Debugger::dump($response->json());
+        return new Response($response->json(), $this->service, $this);
     }
 
     /**
