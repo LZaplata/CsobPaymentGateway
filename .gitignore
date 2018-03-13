@@ -1,6 +1,6 @@
 .idea/
 vendor/
-src/keys/
+src/keys/*
 !src/keys/mips_iplatebnibrana.csob.cz.pub
 !src/keys/mips_platebnibrana.csob.cz.pub
 composer.lock
