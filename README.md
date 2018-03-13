@@ -58,7 +58,8 @@ $payment = $this->csobPaymentGateway->createPayment(
         $orderNo,          
         $totalAmount,                    // payment price in lowest currency unit (1 CZK = 100)
         $returnUrl,                  
-        $cart                            // cart instace from step above
+        $cart,                           // cart instace from step above
+        $payOperation                    // type of payment operation - default Payment::NORMAL_PAYMENT
 );
 ````
 
