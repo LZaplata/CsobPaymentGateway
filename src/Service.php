@@ -70,9 +70,9 @@ class Service extends Object
         $this->sandbox = $sandbox;
 
         if ($sandbox) {
-            $this->url = "https://iapi.iplatebnibrana.csob.cz/api/v1.7";
+            $this->url = "https://iapi.iplatebnibrana.csob.cz/api/v1.8";
         } else {
-            $this->url = "https://api.platebnibrana.csob.cz/api/v1.7";
+            $this->url = "https://api.platebnibrana.csob.cz/api/v1.8";
         }
 
         return $this;
@@ -148,12 +148,13 @@ class Service extends Object
      * @param float $totalAmount
      * @param string $returnUrl
      * @param Cart $cart
+     * @param string $payOperation
      * @return Payment
      */
-    public function createPayment($orderNo, $totalAmount, $returnUrl, Cart $cart)
+    public function createPayment($orderNo, $totalAmount, $returnUrl, Cart $cart, $payOperation = Payment::NORMAL_PAYMENT)
     {
         $payment = new Payment($this);
-        $payment->createPayment($orderNo, $totalAmount, $returnUrl, $cart);
+        $payment->createPayment($orderNo, $totalAmount, $returnUrl, $cart, $payOperation);
 
         return $payment;
     }

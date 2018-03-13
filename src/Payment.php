@@ -29,17 +29,24 @@ class Payment extends Object
     /** @var array */
     public $paymentData;
 
+    /** @var string */
+    public $payOperation;
+
+    const NORMAL_PAYMENT = "payment",
+        CUSTOM_PAYMENT = "customPayment";
+
     public function __construct(Service $service)
     {
         $this->service = $service;
     }
 
-    public function createPayment($orderNo, $totalAmount, $returnUrl, Cart $cart)
+    public function createPayment($orderNo, $totalAmount, $returnUrl, Cart $cart, $payOperation)
     {
         $this->orderNo = $orderNo;
         $this->totalAmount = $totalAmount;
         $this->returnUrl = $returnUrl;
         $this->cart = $cart;
+        $this->payOperation = $payOperation;
 
         $this->createPaymentData();
     }
@@ -50,7 +57,7 @@ class Payment extends Object
             "merchantId" => $this->service->getMerchantId(),
             "orderNo" => $this->orderNo,
             "dttm" => date("YmdHis"),
-            "payOperation" => "payment",
+            "payOperation" => $this->payOperation,
             "payMethod" => "card",
             "totalAmount" => $this->totalAmount,
             "currency" => $this->service->getCurrency(),
@@ -133,7 +140,7 @@ class Payment extends Object
 
         $privateKeyId = openssl_get_privatekey($privateKey, $this->service->getPrivateKey()["password"]);
 
-        openssl_sign($dataToSign, $signature, $privateKeyId);
+        openssl_sign($dataToSign, $signature, $privateKeyId, OPENSSL_ALGO_SHA256);
 
         $signature = base64_encode($signature);
 
@@ -194,7 +201,7 @@ class Payment extends Object
 
         $publicKeyId = openssl_get_publickey($publicKey);
         $signature = base64_decode($signatureBase64);
-        $result = openssl_verify($dataToVerify, $signature, $publicKeyId);
+        $result = openssl_verify($dataToVerify, $signature, $publicKeyId, OPENSSL_ALGO_SHA256);
 
         openssl_free_key($publicKeyId);
 
