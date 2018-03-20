@@ -69,6 +69,10 @@ class Payment extends Object
             "language" => "CZ"
         ];
 
+        if ($this->payOperation == self::CUSTOM_PAYMENT) {
+            $this->paymentData["customExpiry"] = date("YmdHis", strtotime("+7days"));
+        }
+
         $this->paymentData["signature"] = $this->signPaymentData($this->paymentData);
     }
 
@@ -119,6 +123,10 @@ class Payment extends Object
 
         $dataToSign = $data["merchantId"] . "|" .  $data["orderNo"] . "|" . $data["dttm"] . "|" . $data["payOperation"] . "|" . $data["payMethod"] . "|" . $data["totalAmount"] ."|". $data["currency"] ."|". $data["closePayment"]  . "|". $data["returnUrl"] ."|". $data["returnMethod"] . "|" . $cartToSign . "|" . $data["description"] . "|" . $data["language"];
 
+        if ($this->payOperation == self::CUSTOM_PAYMENT) {
+            $dataToSign .= "|" . $data["customExpiry"];
+        }
+
         return $this->sign($dataToSign);
     }
 
@@ -165,8 +173,10 @@ class Payment extends Object
             throw new BadRequestException("Payment init failed. Reason phase: " . $response->getReasonPhrase());
         }
 
-        if ($this->verifyPaymentData($response->json()) == false) {
-            throw new BadRequestException("Payment init failed. Unable to verify signature");
+        if ($this->payOperation != self::CUSTOM_PAYMENT) {
+            if ($this->verifyPaymentData($response->json()) == false) {
+                throw new BadRequestException("Payment init failed. Unable to verify signature");
+            }
         }
 
         return new Response($response->json(), $this->service, $this);

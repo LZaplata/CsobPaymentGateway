@@ -23,6 +23,9 @@ class Service extends Object
     public $url;
 
     /** @var string */
+    public $customPaymentUrl;
+
+    /** @var string */
     public $currency;
 
     /**
@@ -71,8 +74,10 @@ class Service extends Object
 
         if ($sandbox) {
             $this->url = "https://iapi.iplatebnibrana.csob.cz/api/v1.8";
+            $this->customPaymentUrl = "https://iplatebnibrana.csob.cz";
         } else {
             $this->url = "https://api.platebnibrana.csob.cz/api/v1.8";
+            $this->customPaymentUrl = "https://platebnibrana.csob.cz";
         }
 
         return $this;
@@ -84,6 +89,14 @@ class Service extends Object
     public function getUrl()
     {
         return $this->url;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCustomPaymentUrl()
+    {
+        return $this->customPaymentUrl;
     }
 
     /**
@@ -181,6 +194,11 @@ class Service extends Object
         } else return false;
     }
 
+    /**
+     * @param int $payId
+     * @return Response
+     * @throws \Nette\Application\BadRequestException
+     */
     public function reversePayment($payId)
     {
         $payment = new Payment($this);

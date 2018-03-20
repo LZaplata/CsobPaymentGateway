@@ -49,12 +49,24 @@ class Response extends Object
     /**
      * @return string
      */
+    public function getCustomerCode()
+    {
+        return $this->response["customerCode"];
+    }
+    
+    /**
+     * @return string
+     */
     public function getRedirectUrl()
     {
         $dataToSign = $this->service->getMerchantId() . "|" . $this->getPayId() . "|" . $this->getDttm();
         $signature = $this->payment->sign($dataToSign);
 
-        return $this->service->getUrl() . "/payment/process/" . $this->service->getMerchantId() . "/" . $this->getPayId() . "/" . $this->getDttm() . "/" . urlencode($signature);
+        if ($this->payment->payOperation == Payment::CUSTOM_PAYMENT) {
+            return $this->service->getCustomPaymentUrl() . "/zaplat/" . $this->getCustomerCode();
+        } else {
+            return $this->service->getUrl() . "/payment/process/" . $this->service->getMerchantId() . "/" . $this->getPayId() . "/" . $this->getDttm() . "/" . urlencode($signature);
+        }
     }
 
     /**
