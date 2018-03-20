@@ -173,10 +173,8 @@ class Payment extends Object
             throw new BadRequestException("Payment init failed. Reason phase: " . $response->getReasonPhrase());
         }
 
-        if ($this->payOperation != self::CUSTOM_PAYMENT) {
-            if ($this->verifyPaymentData($response->json()) == false) {
-                throw new BadRequestException("Payment init failed. Unable to verify signature");
-            }
+        if ($this->verifyPaymentData($response->json()) == false) {
+            throw new BadRequestException("Payment init failed. Unable to verify signature");
         }
 
         return new Response($response->json(), $this->service, $this);
@@ -192,6 +190,10 @@ class Payment extends Object
 
         if (isset($data["authCode"]) && !is_null($data["authCode"])) {
             $dataToVerify .= "|" . $data["authCode"];
+        }
+
+        if (isset($data["customerCode"]) && !is_null($data["customerCode"])) {
+            $dataToVerify .= "|" . $data["customerCode"];
         }
 
         return $this->verify($dataToVerify, $data["signature"]);
