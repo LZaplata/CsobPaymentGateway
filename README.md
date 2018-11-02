@@ -48,7 +48,12 @@ Create cart instance and add items.
 
 ````php
 $cart = new Cart();
-$cart->setItem($name, $quantity, $amount, $description);
+$cart->setItem(
+        $name,                          
+        $quantity,                      
+        $amount,                        // item price * quantity
+        $description
+);
 ````
 
 Create payment.
