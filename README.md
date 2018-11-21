@@ -51,7 +51,7 @@ $cart = new Cart();
 $cart->setItem(
         $name,                          
         $quantity,                      
-        $amount,                        // item price * quantity
+        $amount,                        // item price * quantity in lowest currency unit (1 CZK = 100)
         $description
 );
 ````
