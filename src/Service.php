@@ -73,10 +73,10 @@ class Service extends Object
         $this->sandbox = $sandbox;
 
         if ($sandbox) {
-            $this->url = "https://iapi.iplatebnibrana.csob.cz/api/v1.7";
+            $this->url = "https://iapi.iplatebnibrana.csob.cz/api/v1.8";
             $this->customPaymentUrl = "https://iplatebnibrana.csob.cz";
         } else {
-            $this->url = "https://api.platebnibrana.csob.cz/api/v1.7";
+            $this->url = "https://api.platebnibrana.csob.cz/api/v1.8";
             $this->customPaymentUrl = "https://platebnibrana.csob.cz";
         }
 
