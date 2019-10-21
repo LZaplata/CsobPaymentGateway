@@ -65,7 +65,6 @@ class Payment extends Object
             "returnUrl" => $this->returnUrl,
             "returnMethod" => "POST",
             "cart" => $this->cart->getItems(),
-            "description" => "purchase",
             "language" => "CZ"
         ];
 
