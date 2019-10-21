@@ -120,7 +120,7 @@ class Payment extends Object
             $cartToSign .= implode("|", $item);
         }
 
-        $dataToSign = $data["merchantId"] . "|" .  $data["orderNo"] . "|" . $data["dttm"] . "|" . $data["payOperation"] . "|" . $data["payMethod"] . "|" . $data["totalAmount"] ."|". $data["currency"] ."|". $data["closePayment"]  . "|". $data["returnUrl"] ."|". $data["returnMethod"] . "|" . $cartToSign . "|" . $data["description"] . "|" . $data["language"];
+        $dataToSign = $data["merchantId"] . "|" .  $data["orderNo"] . "|" . $data["dttm"] . "|" . $data["payOperation"] . "|" . $data["payMethod"] . "|" . $data["totalAmount"] ."|". $data["currency"] ."|". $data["closePayment"]  . "|". $data["returnUrl"] ."|". $data["returnMethod"] . "|" . $cartToSign . "|" . $data["language"];
 
         if ($this->payOperation == self::CUSTOM_PAYMENT) {
             $dataToSign .= "|" . $data["customExpiry"];
