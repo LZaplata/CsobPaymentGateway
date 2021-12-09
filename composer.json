@@ -3,6 +3,7 @@
     "description": "ČSOB payment gateway wrapper for Nette Framework.",
     "keywords": ["nette", "csob", "gateway"],
     "homepage": "https://github.com/LZaplata/CsobPaymentGateway",
+    "licence": "MIT",
     "authors": [
         {
             "name": "Lukáš Záplata",
